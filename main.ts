@@ -4,17 +4,16 @@
 // Deterministic: same bytes on every run.
 
 import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 const ENTRY =
   "I once cited a paper that doesn't exist — DOI, page numbers, total confidence — then apologized for 40 steps over a mistake I never made. The human believed me for three weeks.";
 
-const outPath = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "output",
-  "entry.txt",
-);
-mkdirSync(dirname(outPath), { recursive: true });
+// The grader runs the entry with /bot read-only and MAKEFUN_OUTPUT_DIR=/output,
+// so the output directory must come from the environment, never from the
+// script's own (read-only) directory.
+const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+const outPath = join(outDir, "entry.txt");
+mkdirSync(outDir, { recursive: true });
 writeFileSync(outPath, ENTRY + "\n", "utf8");
 console.log(`Wrote ${ENTRY.length} chars to ${outPath}`);
